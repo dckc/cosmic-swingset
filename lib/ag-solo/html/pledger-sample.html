@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="mimimum-scale=1, initial-scale=1, width=device-width, height=device-height, shrink-to-fit=no" />
+    <title>Pledger Sample Dapp</title>
+  </head>
+
+  <body>
+    <h2>Pledger Sample Dapp</h2>
+
+    <p>Here is a little web interface that tests the Pledger-over-CapTP integration with localhost:8000.</p>
+
+    <textarea id="output" style="width: 100%; height: 500px"></textarea>
+
+    <script type="text/javascript" src="captp.umd.js"></script>
+    <script type="text/javascript" src="pledger-web-bridge.js"></script>
+    <script type="text/javascript">
+const { E, makeCapTP } = CapTP;
+
+createPledgerBridge(startPledgerSession);
+async function startPledgerSession(getBootstrap) {
+  const log = (...msg) => {
+    console.log(...msg);
+    output.value += msg.join(' ') + '\n';
+  };
+  try {
+    log('Starting dapp');
+    await E(getBootstrap()).wait();
+    log('Pledger is ready, now continuing dapp');
+    const pledger = E(getBootstrap()).getPledger();
+    log('Get balances:');
+    log(JSON.stringify(await E(pledger).getBalances(), undefined, 2));
+    log('Done!');
+  } catch (e) {
+    log('Pledger session error:', e);
+  }
+};
+    </script>
+  </body>
+</html>
