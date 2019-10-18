@@ -16,22 +16,33 @@
     <script type="text/javascript" src="captp.umd.js"></script>
     <script type="text/javascript" src="pledger-web-bridge.js"></script>
     <script type="text/javascript">
-const { E, makeCapTP } = CapTP;
+const { E, harden, makeCapTP } = CapTP;
 
 createPledgerBridge(startPledgerSession);
+const log = (...msg) => {
+  console.log(...msg);
+  output.value += msg.join(' ') + '\n';
+};
+
+async function getBalances(pledger) {
+  log('Get balances:');
+  const [changedP, balances] = await E(pledger).getBalances();
+  log(JSON.stringify(balances, undefined, 2));
+  changedP.then(
+    () => getBalances(pledger),
+    e => log('Pledger getBalance', name, 'error:', e),
+  );
+  return balances;
+}
+
 async function startPledgerSession(getBootstrap) {
-  const log = (...msg) => {
-    console.log(...msg);
-    output.value += msg.join(' ') + '\n';
-  };
   try {
     log('Starting dapp');
     await E(getBootstrap()).wait();
     log('Pledger is ready, now continuing dapp');
     const pledger = E(getBootstrap()).getPledger();
-    log('Get balances:');
-    log(JSON.stringify(await E(pledger).getBalances(), undefined, 2));
-    log('Done!');
+    await getBalances(pledger);
+    log('Entering wait loop');
   } catch (e) {
     log('Pledger session error:', e);
   }
