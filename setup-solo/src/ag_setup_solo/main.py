@@ -12,7 +12,7 @@ import os
 import urllib.request
 
 MAILBOX_URL = u"ws://relay.magic-wormhole.io:4000/v1"
-#MAILBOX_URL = u"ws://10.0.2.24:4000/v1"
+# MAILBOX_URL = u"ws://10.0.2.24:4000/v1"
 APPID = u"agoric.com/ag-testnet1/provisioning-tool"
 NETWORK_CONFIG = "https://testnet.agoric.com/network-config"
 # We need this to connect to cloudflare's https.
@@ -23,12 +23,13 @@ USER_AGENT = "Mozilla/5.0"
 candidate = os.path.normpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..'))
 AG_SOLO = os.path.join(candidate, 'bin', 'ag-solo')
 while not os.path.exists(AG_SOLO):
-  next_candidate = os.path.dirname(candidate)
-  if next_candidate == candidate:
-    AG_SOLO = 'ag-solo'
-    break
-  candidate = next_candidate
-  AG_SOLO = os.path.join(candidate, 'bin', 'ag-solo')
+    next_candidate = os.path.dirname(candidate)
+    if next_candidate == candidate:
+        AG_SOLO = 'ag-solo'
+        break
+    candidate = next_candidate
+    AG_SOLO = os.path.join(candidate, 'bin', 'ag-solo')
+
 
 class Options(usage.Options):
     optParameters = [
@@ -36,6 +37,7 @@ class Options(usage.Options):
         ["webport", "p", "8000", "client-visible HTTP listening port"],
         ["netconfig", None, NETWORK_CONFIG, "website for network config"]
     ]
+
     def parseArgs(self, basedir=os.environ.get('AG_SOLO_BASEDIR', 'agoric')):
         self['basedir'] = os.environ['AG_SOLO_BASEDIR'] = basedir
 
@@ -43,9 +45,12 @@ class Options(usage.Options):
 def setIngress(sm):
     print('Setting chain parameters with ' + AG_SOLO)
     subprocess.run([AG_SOLO, 'set-gci-ingress', '--chainID=%s' % sm['chainName'], sm['gci'], *sm['rpcAddrs']], check=True)
+
+
 def restart():
     print('Restarting ' + AG_SOLO)
     os.execvp(AG_SOLO, [AG_SOLO, 'start', '--role=client'])
+
 
 @defer.inlineCallbacks
 def run_client(reactor, o, pkeyFile):
@@ -94,10 +99,12 @@ def run_client(reactor, o, pkeyFile):
         raise
     restart()
 
+
 def doInit(o):
     BASEDIR = o['basedir']
     # run 'ag-solo init BASEDIR'
     subprocess.run([AG_SOLO, 'init', BASEDIR, '--webhost=' + o['webhost'], '--webport=' + o['webport']], check=True)
+
 
 def main():
     o = Options()
@@ -105,7 +112,7 @@ def main():
     pkeyFile = os.path.join(o['basedir'], 'ag-cosmos-helper-address')
     # If the public key file does not exist, just init and run.
     if not os.path.exists(pkeyFile):
-        react(run_client, (o,pkeyFile))
+        react(run_client, (o, pkeyFile))
         sys.exit(1)
 
     yesno = input('Type "yes" to reset state from ' + o['netconfig'] + ', anything else cancels: ')
@@ -124,28 +131,28 @@ def main():
     connections_json = os.path.join(o['basedir'], 'connections.json')
     conns = []
     try:
-      f = open(connections_json)
-      conns = json.loads(f.read())
+        f = open(connections_json)
+        conns = json.loads(f.read())
     except FileNotFoundError:
-      pass
+        pass
 
     # Maybe just run the ag-solo command if our params already match.
     for conn in conns:
-      if 'GCI' in conn and conn['GCI'] == netconfig['gci']:
-        print('Already have an entry for ' + conn['GCI'] + '; not replacing')
-        restart()
-        sys.exit(1)
+        if 'GCI' in conn and conn['GCI'] == netconfig['gci']:
+            print('Already have an entry for ' + conn['GCI'] + '; not replacing')
+            restart()
+            sys.exit(1)
 
     # Blow away everything except the key file and state dir.
     helperStateDir = os.path.join(o['basedir'], 'ag-cosmos-helper-statedir')
     for name in os.listdir(o['basedir']):
-      p = os.path.join(o['basedir'], name)
-      if p == pkeyFile or p == helperStateDir:
-        continue
-      if os.path.isdir(p) and not os.path.islink(p):
-        shutil.rmtree(p)
-      else:
-        os.remove(p)
+        p = os.path.join(o['basedir'], name)
+        if p == pkeyFile or p == helperStateDir:
+            continue
+        if os.path.isdir(p) and not os.path.islink(p):
+            shutil.rmtree(p)
+        else:
+            os.remove(p)
 
     # Upgrade the ag-solo files.
     doInit(o)
