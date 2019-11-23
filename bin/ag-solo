@@ -4,7 +4,14 @@ const process = require('process');
 require = require('esm')(module);
 const solo = require('../lib/ag-solo/main.js').default;
 
-solo(process.argv[1], process.argv.splice(2)).then(
+solo(process.argv[1], process.argv.splice(2),
+     {
+       env: process.env,
+       stdout: process.stdout,
+       fs: require('fs'),
+       path: require('path'),
+       process,
+     }).then(
   _res => 0,
   rej => {
     console.log(`error running ag-solo:`, rej);
