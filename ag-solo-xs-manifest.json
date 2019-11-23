@@ -1,0 +1,22 @@
+{
+  "include": "$(MODDABLE)/examples/manifest_base.json",
+  "modules": {
+    "main": "./ag-solo-xs-main",
+    "expr": "./xs-platform/expr",
+    "@agoric/harden": "./xs-platform/deepFreeze",
+    "@agoric/nat": [ "./node_modules/@agoric/nat/dist/nat.esm" ],
+    "@agoric/eventual-send": "./node_modules/@agoric/eventual-send/dist/eventual-send.esm"
+  },
+  "preload": [ "@agoric/eventual-send", "@agoric/harden", "@agoric/nat" ],
+  "creation": {
+    "keys": {
+      "available": 4096
+    },
+    "stack": 4096
+  },
+  "data": {
+    "kernel.js": [
+      "./node_modules/@agoric/swingset-vat/src/bundles/kernel"
+    ]
+  }
+}
