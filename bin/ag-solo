@@ -11,6 +11,7 @@ solo(process.argv[1], process.argv.splice(2),
        fs: require('fs'),
        path: require('path'),
        process,
+       createServer: require('http').createServer,
      }).then(
   _res => 0,
   rej => {
