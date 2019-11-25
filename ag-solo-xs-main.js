@@ -1,29 +1,32 @@
 /* global trace, Compartment */
 
-import { File, Iterator } from 'file';  // beware: powerful!
 import Resource from 'Resource';
 
 import harden from '@agoric/harden';
 import Nat from '@agoric/nat';
 
+import { File, Iterator } from 'file';  // beware: powerful!
+
 import { makePath } from './xs-platform/pathlib';
+
+// ref moddable/examples/base/timers/main.js
+import Timer from 'timer';
 
 import start from './lib/ag-solo/start';
 
 trace("top-level executes\n");
 
-function agRequire(modSpec) {
-  trace(`agRequire(${modSpec})\n`);
-  switch(modSpec) {
-  case '@agoric/harden':
-    return harden({ default: harden });
-  case '@agoric/nat':
-    return harden({ default: Nat });
-  default:
-    throw('bad module or something?');
-  }
+function setImmediate(callback) {
+  Timer.set(callback);
 }
 
+function setInterval(callback, delay) {
+  Timer.repeat(callback, delay);
+}
+
+function now() {
+  return Date.now();
+}
 
 function loadKernel() {
   const kernelEndowments = {
@@ -60,33 +63,28 @@ export default function main(argv) {
   trace("argv: " + argv + "\n");
 
   const cwd = makePath('.', { File, Iterator });
-  testForBug().then(_ => { console.log('@@no bug?'); });
-  try {
-    run(argv, cwd);
-  } catch(oops) {
-    console.log(oops.message);
-    // TODO: exit(1);
-  }
+  run(argv, cwd)
+    .then(_ => console.log('run() done.'))
+    .catch(oops => {
+      console.log('run() oops: ', oops);
+      console.log('run() oops: ', oops.message);
+      // TODO: exit(1);
+    });
 }
 
-async function testForBug() {
-  const things = [1, 2, 3];
-  await Promise.all(things.map(async x => {
-    console.log({x});
-  }));
-  console.log('@@@await Promise.all done.');
-}
-
-function run(argv, cwd) {
+async function run(argv, cwd) {
+  if (false) { //@@@
   const kernel = loadKernel();
   trace(`kernel keys: ${JSON.stringify(Object.keys(kernel))}\n`);
+  }
 
-  const withSES = false;
+  const withSES = true;
 
   if (argv.length < 1) {
     throw('Usage: ag-solo basedir');
   }
 
   const basedir = cwd.join(argv[0]);
-  start(basedir, withSES, argv, { createServer });
+  return start(basedir, withSES, argv,
+	       { createServer, setImmediate, setInterval, now });
 }

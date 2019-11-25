@@ -6,7 +6,7 @@ import Nat from '@agoric/nat';
 export function eval2(expr, endowments) {
   const params = Object.keys(endowments || {}).join(', ');
   const wrap = `(function ({${params}}) { return ${expr}; })`;
-  console.log('@@eval2 wrap:', wrap.slice(0, 800));
+  // console.log('eval2 wrap:', wrap.slice(0, 800));
   const f = (1, eval)(wrap);
   return f(endowments);
 }
@@ -36,7 +36,6 @@ function confineExpr() {
 
 const makeRealmSrc = `(
 function makeRealm() {
-console.log('@@h', typeof harden);
   return harden({
     makeRequire(options) {
       console.log('@@makeRequire', {optionKeys: Object.keys(options)});
