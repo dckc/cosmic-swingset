@@ -1,13 +1,37 @@
 {
-  "include": "$(MODDABLE)/examples/manifest_base.json",
+  "include": [
+    "$(MODDABLE)/examples/manifest_base.json"
+  ],
+  "$comment": "can't use ./lib/* cuz it has .c stuff that mcconfig will try to use",
   "modules": {
+    "file": [
+      "$(MODULES)/files/file/*",
+      "$(MODULES)/files/file/lin/*",
+    ],
     "main": "./ag-solo-xs-main",
-    "expr": "./xs-platform/expr",
-    "@agoric/harden": "./xs-platform/deepFreeze",
+    "preload": "./xs-platform/preload",
+    "console": "./xs-platform/console",
+    "./xs-platform/pathlib": "./xs-platform/pathlib",
+    "./lib/directory-marker": "./lib/directory-marker",
+    "./lib/ag-solo/main": "./lib/ag-solo/main",
+    "./lib/ag-solo/insist": "./lib/ag-solo/insist",
+    "./lib/ag-solo/start": "./lib/ag-solo/start",
+    "./lib/ag-solo/outbound": "./lib/ag-solo/outbound",
+    "expr": "./xs-platform/emulate/expr",
+    "assert": "./xs-platform/emulate/assert",
+    "ses": "./xs-platform/emulate/ses",
+    "minimist": "./xs-platform/emulate/dummy",
+    "n-readlines": "./node_modules/n-readlines/readlines",
+    "@agoric/harden": "./xs-platform/emulate/harden",
     "@agoric/nat": [ "./node_modules/@agoric/nat/dist/nat.esm" ],
-    "@agoric/eventual-send": "./node_modules/@agoric/eventual-send/dist/eventual-send.esm"
+    "@agoric/eventual-send": "./node_modules/@agoric/eventual-send/dist/eventual-send.esm",
+    "@agoric/swingset-vat/*": "./node_modules/@agoric/swingset-vat/src/*",
+    "@agoric/swingset-vat/devices/*": "./node_modules/@agoric/swingset-vat/src/devices/*"
   },
-  "preload": [ "@agoric/eventual-send", "@agoric/harden", "@agoric/nat" ],
+  "preload": [
+    "@agoric/eventual-send", "@agoric/harden", "@agoric/nat",
+    "preload"
+  ],
   "creation": {
     "keys": {
       "available": 4096

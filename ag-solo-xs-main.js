@@ -1,9 +1,14 @@
 /* global trace, Compartment */
 
+import { File, Iterator } from 'file';  // beware: powerful!
 import Resource from 'Resource';
 
 import harden from '@agoric/harden';
 import Nat from '@agoric/nat';
+
+import { makePath } from './xs-platform/pathlib';
+
+import start from './lib/ag-solo/start';
 
 trace("top-level executes\n");
 
@@ -49,9 +54,39 @@ function loadKernel() {
   return buildKernel(kernelEndowments);
 }
 
-export default function main(argv) {
-  trace("main argv: " + argv + "\n");
+function createServer() { throw('TODO!'); }
 
+export default function main(argv) {
+  trace("argv: " + argv + "\n");
+
+  const cwd = makePath('.', { File, Iterator });
+  testForBug().then(_ => { console.log('@@no bug?'); });
+  try {
+    run(argv, cwd);
+  } catch(oops) {
+    console.log(oops.message);
+    // TODO: exit(1);
+  }
+}
+
+async function testForBug() {
+  const things = [1, 2, 3];
+  await Promise.all(things.map(async x => {
+    console.log({x});
+  }));
+  console.log('@@@await Promise.all done.');
+}
+
+function run(argv, cwd) {
   const kernel = loadKernel();
   trace(`kernel keys: ${JSON.stringify(Object.keys(kernel))}\n`);
+
+  const withSES = false;
+
+  if (argv.length < 1) {
+    throw('Usage: ag-solo basedir');
+  }
+
+  const basedir = cwd.join(argv[0]);
+  start(basedir, withSES, argv, { createServer });
 }
