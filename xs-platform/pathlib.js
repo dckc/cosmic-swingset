@@ -32,14 +32,32 @@ export function makePath(filename, { File, Iterator }) {
     return items;
   }
 
+  function butLast(p) {
+    const pos = p.lastIndexOf('/');
+    return pos >= 0 ? p.slice(0, pos + 1) : p;
+  }
+
+  function bundleSource() {
+    const parts = filename.match(/vat(-)([^\.]+).js$/);
+    if (!parts) {
+      throw new Error(`expected vat-NAME.js; got: ${filename}`);
+    }
+    const bundlePath = `${butLast(filename)}vat_${parts[2]}-src.js`;
+    console.log(`@@bundleSource ${filename} -> ${bundlePath}`);
+    const src = mk(bundlePath).readFileSync();
+    return {
+      source: src.replace(/^export default /, ''),
+      sourceMap: `//# sourceURL=${filename}\n`,
+    };
+  }
+
   return harden({
     toString() {
       return filename;
     },
     resolve(...others) {
       // ISSUE: support ../?
-      // TODO: chop off filename at last /
-      return mk([filename, ...others].join('/'));
+      return mk([butLast(filename), ...others].join('/'));
     },
     join(...others) {
       // ISSUE: support ../?
@@ -54,5 +72,6 @@ export function makePath(filename, { File, Iterator }) {
       return readFileSync().replace(/\n$/, '').split('\n');
     },
     readdirSync,
+    bundleSource,
   });
 }
