@@ -17,14 +17,17 @@ import start from './lib/ag-solo/start';
 trace("top-level executes\n");
 
 function setImmediate(callback) {
-  Timer.set(callback);
+  // @@@not sure about this.
+  // https://github.com/Moddable-OpenSource/moddable/blob/public/documentation/base/base.md#timer
+  // https://github.com/Agoric/SwingSet/issues/121
+  Timer.set(callback, 1);
 }
 
 function setInterval(callback, delay) {
   Timer.repeat(callback, delay);
 }
 
-function now() {
+function clock() {
   return Date.now();
 }
 
@@ -86,5 +89,5 @@ async function run(argv, cwd) {
 
   const basedir = cwd.join(argv[0]);
   return start(basedir, withSES, argv,
-	       { createServer, setImmediate, setInterval, now });
+	       { createServer, setImmediate, setInterval, clock });
 }
