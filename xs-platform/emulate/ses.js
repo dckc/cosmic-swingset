@@ -6,7 +6,7 @@ import Nat from '@agoric/nat';
 export function eval2(expr, endowments) {
   const params = Object.keys(endowments || {}).join(', ');
   const wrap = `(function ({${params}}) { return ${expr}; })`;
-  // console.log('eval2 wrap:', wrap.slice(0, 800));
+  console.log('@@eval2 wrap:', wrap.slice(0, 120));
   const f = (1, eval)(wrap);
   return f(endowments);
 }
@@ -38,7 +38,7 @@ const makeRealmSrc = `(
 function makeRealm() {
   return harden({
     makeRequire(options) {
-      console.log('@@makeRequire', {optionKeys: Object.keys(options)});
+      // console.log('makeRequire', {optionKeys: Object.keys(options)});
       return agRequire;
     },
     evaluate: eval2,
@@ -53,7 +53,7 @@ function makeRealm() {
 )`;
 
 export function makeSESRootRealm(options) {
-  console.log('@@makeSESRootRealm', { optionKeys: Object.keys(options) });
+  // console.log('makeSESRootRealm', { optionKeys: Object.keys(options) });
   const { ses, '@agoric/harden': agHarden, '@agoric/nat': agNat } = Compartment.map;
   const map = { ses, '@agoric/harden': agHarden, '@agoric/nat': agNat };
   const optEndowments = options.consoleMode == 'allow' ? { console } : {};
@@ -61,9 +61,8 @@ export function makeSESRootRealm(options) {
 
   const c = makeCompartment();
   const makeRealm = c.export.eval2(makeRealmSrc, { makeCompartment, eval2, console, agRequire, harden });
-  console.log('@@makeRealm:', makeRealm);
   const realm = makeRealm();
-  console.log('@@new realm:', realm);
+  // console.log('new realm:', realm);
   return realm;
 }
 
