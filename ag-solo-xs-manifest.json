@@ -47,8 +47,8 @@
     "@agoric.mailbox-src": "./node_modules/@agoric/swingset-vat/src/bundles/mailbox-src",
     "@agoric.command-src": "./node_modules/@agoric/swingset-vat/src/bundles/command-src",
     "@agoric.timer-src": "./node_modules/@agoric/swingset-vat/src/bundles/timer-src",
-    "@agoric.comms": "./node_modules/@agoric/swingset-vat/src/vats/comms",
-    "@agoric.vattp": "./node_modules/@agoric/swingset-vat/src/vats/vat-tp/vattp",
-    "@agoric.vat-timerWrapper": "./node_modules/@agoric/swingset-vat/src/vats/vat-timerWrapper"
+    "@agoric.comms": "./node_modules/@agoric/swingset-vat/src/bundles/vat_comms-src",
+    "@agoric.vattp": "./node_modules/@agoric/swingset-vat/src/bundles/vat_vattp-src",
+    "@agoric.vat-timerWrapper": "./node_modules/@agoric/swingset-vat/src/bundles/vat_timer-src"
   }
 }
