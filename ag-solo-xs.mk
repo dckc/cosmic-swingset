@@ -11,9 +11,7 @@ release-build:
 	$(MODDABLE)/build/bin/lin/release/$(PKG) $(BASEDIR)
 
 debug-build:
-	mcconfig -d -p x-cli-lin ag-solo-xs-manifest.json
-	cd $(MODDABLE)/build/tmp/lin/debug/$(PKG) && $(MAKE)
-	$(MODDABLE)/build/bin/lin/debug/$(PKG) $(BASEDIR)
+	mcconfig -d -p lin -m ag-solo-xs-manifest.json
 
 clean:
 	-rm -rf $(MODDABLE)/build/tmp/lin/release/$(PKG)

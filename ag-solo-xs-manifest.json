@@ -36,6 +36,7 @@
     "@agoric/eventual-send", "@agoric/harden", "@agoric/nat",
     "preload"
   ],
+  "strip": [],
   "creation": {
     "keys": {
       "available": 4096

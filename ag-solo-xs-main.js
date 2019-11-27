@@ -63,7 +63,7 @@ export default function main(argv) {
   trace("argv: " + argv + "\n");
 
   const cwd = makePath('.', { File, Iterator });
-  run(argv, cwd)
+  run(argv || ['t3', '@@@'], cwd)
     .then(_ => console.log('run() done.'))
     .catch(oops => {
       console.log('run() oops: ', oops);
