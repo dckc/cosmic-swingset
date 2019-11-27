@@ -18,6 +18,39 @@ export function makePath(filename, { File, Iterator }) {
     return contents;
   }
 
+  function withWriting(suffix, thunk) {
+    const tmpName = filename + suffix;
+    const file = new File(tmpName, true);
+    const fp = harden({
+      writeSync(value) {
+	file.write(value);
+      }
+    });
+    try {
+      thunk(fp);
+    } finally {
+      file.close();
+    }
+    File.rename(tmpName, filename);
+  }
+
+  function atomicReplace(contents) {
+    return new Promise(
+      (resolve, reject) => {
+	try {
+	  const tmp = mk(filename + '.tmp');
+	  const tmpF = new File(tmp, true);
+	  tmpF.write(contents);
+	  tmpF.close();
+	  File.rename(tmp, filename);
+	} catch(oops) {
+	  reject(oops);
+	  return;
+	}
+	resolve();
+      });
+  }
+
   function readdirSync(options) {
     const dirIter = new Iterator(filename);
     let item;
@@ -30,6 +63,17 @@ export function makePath(filename, { File, Iterator }) {
       }));
     }
     return items;
+  }
+
+  function readdir() {
+    return new Promise((resolve, reject) => {
+      try {
+	const names = readdirSync({}).map(item => item.name);
+	resolve(names);
+      } catch (oops) {
+	reject(oops);
+      }
+    });
   }
 
   function butLast(p) {
@@ -76,6 +120,9 @@ export function makePath(filename, { File, Iterator }) {
       return readFileSync().replace(/\n$/, '').split('\n');
     },
     readdirSync,
+    readdir,
     bundleSource,
+    atomicReplace,
+    withWriting,
   });
 }
