@@ -38,11 +38,15 @@ export function makePath(filename, { File, Iterator }) {
   }
 
   function bundleSource() {
+    let bundlePath;
     const parts = filename.match(/vat(-)([^\.]+).js$/);
-    if (!parts) {
+    if (parts) {
+      bundlePath = `${butLast(filename)}vat_${parts[2]}-src.js`;
+    } else if (filename.match(/\/bootstrap.js$/)) {
+      bundlePath = `${butLast(filename)}bootstrap-src.js`;
+    } else {
       throw new Error(`expected vat-NAME.js; got: ${filename}`);
     }
-    const bundlePath = `${butLast(filename)}vat_${parts[2]}-src.js`;
     console.log(`@@bundleSource ${filename} -> ${bundlePath}`);
     const src = mk(bundlePath).readFileSync();
     return {
